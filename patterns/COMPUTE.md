@@ -45,9 +45,15 @@ const broker = await createZGComputeNetworkBroker(wallet);
 
 ```typescript
 const services = await broker.inference.listService();
-const chatbotServices = services.filter((s) => s.serviceType === 'chatbot');
-const imageServices = services.filter((s) => s.serviceType === 'text-to-image');
-const speechServices = services.filter((s) => s.serviceType === 'speech-to-text');
+
+// Services are returned as tuple arrays:
+//   [0] = providerAddress, [1] = serviceType, [2] = url,
+//   [6] = model, [10] = teeVerified
+const chatbotServices = services.filter((s: any) => s[1] === 'chatbot');
+const imageServices = services.filter((s: any) => s[1] === 'text-to-image');
+const speechServices = services.filter((s: any) => s[1] === 'speech-to-text');
+
+// Access provider info: s[0] = address, s[6] = model, s[10] = TEE verified
 ```
 
 ### 3. Fund Account
@@ -233,9 +239,10 @@ Trusted Execution Environment verification ensures provider integrity:
 
 ```typescript
 const services = await broker.inference.listService();
+// Tuple: [0]=providerAddress, [1]=serviceType, [10]=teeVerified
 for (const service of services) {
-  if (service.providerAddress === targetProvider) {
-    console.log('TEE verified:', service.teeVerified);
+  if (service[0] === targetProvider) {
+    console.log('TEE verified:', service[10]);
   }
 }
 ```

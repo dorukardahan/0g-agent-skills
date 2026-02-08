@@ -4,16 +4,8 @@ Architecture, SDK reference, and best practices for 0G decentralized storage.
 
 ## Architecture Overview
 
-0G Storage is a two-layer system:
-
-1. **Log Layer** — Append-only data availability layer for raw file storage
-2. **KV Layer** — Key-value store built on top of the Log layer for structured data
-
 ```
 ┌─────────────────────────────────┐
-│          KV Layer               │
-│   (Structured key-value data)   │
-├─────────────────────────────────┤
 │          Log Layer              │
 │   (Raw file / blob storage)    │
 ├─────────────────────────────────┤
@@ -56,10 +48,11 @@ try {
   const [tree, err] = await file.merkleTree();
   if (err) throw err;
 
-  const rootHash = tree.rootHash();
+  const rootHash = tree!.rootHash();
   console.log('Root hash:', rootHash);
 
-  const tx = await indexer.upload(file, wallet);
+  const [tx, uploadErr] = await indexer.upload(file, process.env.RPC_URL!, wallet);
+  if (uploadErr) throw new Error(`Upload failed: ${uploadErr.message}`);
   console.log('Upload tx:', tx);
 
   return rootHash;
@@ -74,7 +67,14 @@ try {
 import { Indexer } from '@0glabs/0g-ts-sdk';
 
 const indexer = new Indexer(process.env.STORAGE_INDEXER!);
-await indexer.download(rootHash, outputPath, /* verified */ true);
+
+// download() can throw OR return an error — always use try/catch
+try {
+  const err = await indexer.download(rootHash, outputPath, /* verified */ true);
+  if (err) throw err;
+} catch (error: any) {
+  throw new Error(`Download failed: ${error.message}`);
+}
 ```
 
 ### Upload from Buffer
@@ -93,60 +93,14 @@ const file = await ZgFile.fromFilePath(tempPath);
 try {
   const [tree, err] = await file.merkleTree();
   if (err) throw err;
-  const rootHash = tree.rootHash();
-  await indexer.upload(file, wallet);
+  const rootHash = tree!.rootHash();
+  const [, uploadErr] = await indexer.upload(file, process.env.RPC_URL!, wallet);
+  if (uploadErr) throw new Error(`Upload failed: ${uploadErr.message}`);
   return rootHash;
 } finally {
   await file.close();
   fs.unlinkSync(tempPath); // Clean up temp file
 }
-```
-
-## KV Layer (Structured Data)
-
-### Core Concepts
-
-- **Stream**: A named data channel (like a database table)
-- **StreamKey**: Identifies an entry within a stream
-- **Batcher**: Batches multiple write operations for efficiency
-- **KvClient**: Reads data from the KV layer
-
-### Write Pattern (Batcher)
-
-```typescript
-import { Indexer, KvClient, Batcher } from '@0glabs/0g-ts-sdk';
-import { ethers } from 'ethers';
-
-const provider = new ethers.JsonRpcProvider(process.env.RPC_URL);
-const wallet = new ethers.Wallet(process.env.PRIVATE_KEY!, provider);
-const indexer = new Indexer(process.env.STORAGE_INDEXER!);
-
-// Create batcher for write operations
-const batcher = new Batcher(1, indexer, wallet);
-
-// Set key-value pairs
-const key = new TextEncoder().encode('my-key');
-const value = new TextEncoder().encode(JSON.stringify({ data: 'hello' }));
-batcher.set(key, value);
-
-// Execute batch write
-const tx = await batcher.exec();
-console.log('Batch tx:', tx);
-```
-
-### Read Pattern (KvClient)
-
-```typescript
-import { KvClient } from '@0glabs/0g-ts-sdk';
-
-const kvClient = new KvClient(process.env.KV_INDEXER!);
-
-const streamId = '0x...'; // Your stream ID
-const key = new TextEncoder().encode('my-key');
-
-const value = await kvClient.getValue(streamId, key);
-const decoded = new TextDecoder().decode(value);
-console.log('Value:', JSON.parse(decoded));
 ```
 
 ## Merkle Verification
@@ -170,8 +124,13 @@ try {
 
 ```typescript
 // The third parameter enables Merkle proof verification
-await indexer.download(rootHash, outputPath, true);
-// Throws if data integrity check fails
+// Note: download() can throw or return errors — always use try/catch
+try {
+  const err = await indexer.download(rootHash, outputPath, true);
+  if (err) throw err;
+} catch (error: any) {
+  throw new Error(`Download failed: ${error.message}`);
+}
 ```
 
 ## Critical Rules

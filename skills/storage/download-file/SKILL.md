@@ -3,7 +3,7 @@
 ## Metadata
 
 - **Category**: storage
-- **SDK**: `@0glabs/0g-ts-sdk` ^0.8.0, `ethers` ^6.13.0
+- **SDK**: `@0glabs/0g-ts-sdk` ^0.3.3, `ethers` ^6.13.0
 - **Activation Triggers**: "download file", "retrieve from 0G", "get file", "fetch from storage"
 
 ## Purpose
@@ -51,7 +51,13 @@ async function downloadFile(rootHash: string, outputPath: string): Promise<void>
   const indexer = new Indexer(process.env.STORAGE_INDEXER!);
 
   // Download with Merkle verification (recommended)
-  await indexer.download(rootHash, outputPath, true);
+  // Note: download() can throw errors (e.g., JsonRpcError) in addition to returning them
+  try {
+    const err = await indexer.download(rootHash, outputPath, true);
+    if (err) throw err;
+  } catch (error: any) {
+    throw new Error(`Download failed: ${error.message}`);
+  }
   console.log(`Downloaded to ${outputPath}`);
 }
 
@@ -86,13 +92,15 @@ async function downloadWithValidation(rootHash: string, outputPath: string): Pro
   const indexer = new Indexer(process.env.STORAGE_INDEXER!);
 
   try {
-    await indexer.download(rootHash, outputPath, true);
+    // download() can throw OR return an error — handle both
+    const err = await indexer.download(rootHash, outputPath, true);
+    if (err) throw err;
     console.log(`Downloaded and verified: ${outputPath}`);
 
     const stats = fs.statSync(outputPath);
     console.log(`File size: ${stats.size} bytes`);
   } catch (error: any) {
-    if (error.message.includes('not found')) {
+    if (error.message?.includes('not found') || error.message?.includes('JsonRpc')) {
       throw new Error(`File not found for root hash: ${rootHash}`);
     }
     throw error;
@@ -109,7 +117,10 @@ async function downloadBatch(
   const indexer = new Indexer(process.env.STORAGE_INDEXER!);
 
   const results = await Promise.allSettled(
-    files.map(({ rootHash, outputPath }) => indexer.download(rootHash, outputPath, true)),
+    files.map(async ({ rootHash, outputPath }) => {
+      const err = await indexer.download(rootHash, outputPath, true);
+      if (err) throw err;
+    }),
   );
 
   results.forEach((result, i) => {
@@ -128,9 +139,17 @@ async function downloadBatch(
 // BAD: Unverified download in production
 await indexer.download(rootHash, outputPath, false);
 
-// BAD: No error handling
+// BAD: No error handling — download() can THROW in addition to returning errors
 await indexer.download(rootHash, outputPath, true);
-// If file doesn't exist, unhandled error
+// If file doesn't exist, throws JsonRpcError!
+
+// GOOD: Proper error handling
+try {
+  const err = await indexer.download(rootHash, outputPath, true);
+  if (err) throw err;
+} catch (error) {
+  console.error('Download failed:', error);
+}
 
 // BAD: Downloading to non-existent directory
 await indexer.download(rootHash, '/nonexistent/path/file.txt', true);

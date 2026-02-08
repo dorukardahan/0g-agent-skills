@@ -61,12 +61,17 @@ async function listProviders() {
 
   const services = await broker.inference.listService();
 
-  // Group by service type
-  const chatbotServices = services.filter((s) => s.serviceType === 'chatbot');
-  const imageServices = services.filter((s) => s.serviceType === 'text-to-image');
-  const speechServices = services.filter((s) => s.serviceType === 'speech-to-text');
+  // Services are returned as tuple arrays:
+  //   [0] = providerAddress, [1] = serviceType, [2] = url,
+  //   [6] = model, [10] = teeVerified
+  const chatbotServices = services.filter((s: any) => s[1] === 'chatbot');
+  const imageServices = services.filter((s: any) => s[1] === 'text-to-image');
+  const speechServices = services.filter((s: any) => s[1] === 'speech-to-text');
 
   console.log(`Chatbot providers: ${chatbotServices.length}`);
+  chatbotServices.forEach((s: any) => {
+    console.log(`  ${s[0]} — model: ${s[6]}, TEE: ${s[10]}`);
+  });
   console.log(`Image providers: ${imageServices.length}`);
   console.log(`Speech providers: ${speechServices.length}`);
 
@@ -83,18 +88,22 @@ async function findVerifiedProvider(serviceType: string) {
   const broker = await createZGComputeNetworkBroker(wallet);
 
   const services = await broker.inference.listService();
-  const filtered = services.filter((s) => s.serviceType === serviceType && s.teeVerified === true);
+
+  // Filter by type and TEE status (tuple: [0]=addr, [1]=type, [6]=model, [10]=tee)
+  const filtered = services.filter((s: any) => s[1] === serviceType && s[10] === true);
 
   if (filtered.length === 0) {
     throw new Error(`No TEE-verified ${serviceType} providers found`);
   }
 
   const selected = filtered[0];
-  console.log(`Selected provider: ${selected.providerAddress}`);
-  console.log(`Model: ${selected.model}`);
-  console.log(`TEE verified: ${selected.teeVerified}`);
+  const providerAddress = selected[0];
+  const model = selected[6];
+  console.log(`Selected provider: ${providerAddress}`);
+  console.log(`Model: ${model}`);
+  console.log(`TEE verified: ${selected[10]}`);
 
-  return selected;
+  return { providerAddress, model, raw: selected };
 }
 ```
 
@@ -138,22 +147,25 @@ async function safeProviderSetup(serviceType: string) {
 
   try {
     const services = await broker.inference.listService();
-    const filtered = services.filter((s) => s.serviceType === serviceType);
+
+    // Tuple: [0]=providerAddress, [1]=serviceType, [6]=model
+    const filtered = services.filter((s: any) => s[1] === serviceType);
 
     if (filtered.length === 0) {
       throw new Error(`No ${serviceType} providers available`);
     }
 
     const selected = filtered[0];
+    const providerAddress = selected[0];
 
     try {
-      await broker.inference.acknowledgeProviderSigner(selected.providerAddress);
+      await broker.inference.acknowledgeProviderSigner(providerAddress);
       console.log('Provider acknowledged successfully');
     } catch (ackError) {
       console.warn('Acknowledgment failed (may already be acknowledged):', ackError);
     }
 
-    return selected;
+    return { providerAddress, model: selected[6], raw: selected };
   } catch (error) {
     console.error('Provider discovery failed:', error);
     throw error;
@@ -171,13 +183,15 @@ async function safeProviderSetup(serviceType: string) {
 | Various  | text-to-image  | Flux Turbo                          |
 | Various  | speech-to-text | Whisper Large V3                    |
 
-### Testnet
+### Testnet (Galileo)
 
-| Service Type   | Models             |
-| -------------- | ------------------ |
-| chatbot        | 3 models available |
-| text-to-image  | Available          |
-| speech-to-text | Available          |
+> Provider availability varies. Use `listService()` to check current providers.
+
+| Service Type   | Status                      |
+| -------------- | --------------------------- |
+| chatbot        | Available (e.g., Qwen 2.5)  |
+| text-to-image  | Limited availability        |
+| speech-to-text | Limited availability        |
 
 ## CLI Commands
 
@@ -201,7 +215,7 @@ const headers = await broker.inference.getRequestHeaders(providerAddress);
 
 // BAD: Not checking TEE for sensitive workloads
 const services = await broker.inference.listService();
-const anyProvider = services[0]; // Could be unverified!
+const anyProvider = services[0]; // Could be unverified! Check s[10] for TEE status
 
 // BAD: Hardcoding provider addresses without verification
 const PROVIDER = '0x123...'; // May be offline or decommissioned

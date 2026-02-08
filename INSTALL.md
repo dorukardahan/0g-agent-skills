@@ -59,7 +59,6 @@ npm install @0glabs/0g-ts-sdk @0glabs/0g-serving-broker ethers dotenv
 PRIVATE_KEY=your_private_key_here
 RPC_URL=https://evmrpc-testnet.0g.ai
 STORAGE_INDEXER=https://indexer-storage-testnet-turbo.0g.ai
-KV_INDEXER=https://indexer-kv-testnet.0g.ai
 PROVIDER_ADDRESS=your_compute_provider_address
 ```
 

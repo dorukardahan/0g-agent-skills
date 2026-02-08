@@ -3,7 +3,7 @@
 ## Metadata
 
 - **Category**: storage
-- **SDK**: `@0glabs/0g-ts-sdk` ^0.8.0, `ethers` ^6.13.0
+- **SDK**: `@0glabs/0g-ts-sdk` ^0.3.3, `ethers` ^6.13.0
 - **Activation Triggers**: "upload file", "store on 0G", "ZgFile", "save to storage"
 
 ## Purpose
@@ -65,10 +65,11 @@ async function uploadFile(filePath: string): Promise<string> {
     const [tree, err] = await file.merkleTree();
     if (err) throw new Error(`Merkle tree error: ${err}`);
 
-    const rootHash = tree.rootHash();
+    const rootHash = tree!.rootHash();
     console.log('Root hash:', rootHash);
 
-    const tx = await indexer.upload(file, wallet);
+    const [tx, uploadErr] = await indexer.upload(file, process.env.RPC_URL!, wallet);
+    if (uploadErr) throw new Error(`Upload failed: ${uploadErr.message}`);
     console.log('Upload tx:', tx);
 
     return rootHash;
@@ -106,8 +107,9 @@ async function uploadBuffer(data: Buffer, filename: string): Promise<string> {
     const [tree, err] = await file.merkleTree();
     if (err) throw new Error(`Merkle tree error: ${err}`);
 
-    const rootHash = tree.rootHash();
-    await indexer.upload(file, wallet);
+    const rootHash = tree!.rootHash();
+    const [, uploadErr] = await indexer.upload(file, process.env.RPC_URL!, wallet);
+    if (uploadErr) throw new Error(`Upload failed: ${uploadErr.message}`);
     return rootHash;
   } finally {
     await file.close();
@@ -156,11 +158,12 @@ async function uploadWithValidation(filePath: string): Promise<string> {
     const [tree, err] = await file.merkleTree();
     if (err) throw new Error(`Merkle tree generation failed: ${err}`);
 
-    const rootHash = tree.rootHash();
+    const rootHash = tree!.rootHash();
     console.log('Root hash:', rootHash);
 
     console.log('Uploading to 0G Storage...');
-    const tx = await indexer.upload(file, wallet);
+    const [tx, uploadErr] = await indexer.upload(file, process.env.RPC_URL!, wallet);
+    if (uploadErr) throw new Error(`Upload failed: ${uploadErr.message}`);
     console.log('Upload complete! Tx:', tx);
 
     return rootHash;
@@ -176,19 +179,22 @@ async function uploadWithValidation(filePath: string): Promise<string> {
 // BAD: Missing file.close() — memory leak
 const file = await ZgFile.fromFilePath('data.txt');
 const [tree] = await file.merkleTree();
-await indexer.upload(file, wallet);
+await indexer.upload(file, process.env.RPC_URL!, wallet);
 // file.close() never called!
 
 // BAD: Uploading without Merkle tree
 const file = await ZgFile.fromFilePath('data.txt');
-await indexer.upload(file, wallet); // May fail or produce invalid upload
+await indexer.upload(file, process.env.RPC_URL!, wallet); // May fail or produce invalid upload
 await file.close();
 
 // BAD: Hardcoded private key
 const wallet = new ethers.Wallet('0xabc123...', provider);
 
 // BAD: Not storing root hash
-await indexer.upload(file, wallet); // Root hash lost!
+await indexer.upload(file, process.env.RPC_URL!, wallet); // Root hash lost!
+
+// BAD: Wrong upload signature (missing RPC URL)
+await indexer.upload(file, wallet); // TypeError — must pass RPC URL as second arg
 ```
 
 ## Common Errors & Fixes
@@ -205,7 +211,6 @@ await indexer.upload(file, wallet); // Root hash lost!
 
 - [Download File](../download-file/SKILL.md) — retrieve uploaded files
 - [Merkle Verification](../merkle-verification/SKILL.md) — verify data integrity
-- [KV Store](../kv-store/SKILL.md) — structured key-value storage
 - [Storage + Chain](../../cross-layer/storage-plus-chain/SKILL.md) — on-chain references
 
 ## References

@@ -1,7 +1,7 @@
 # 0G Agent Skills — Orchestration Guide
 
 Master orchestration file for AI coding assistants. Defines activation triggers, workflow sequences,
-critical rules, and common mistakes for all 15 skills across 4 categories.
+critical rules, and common mistakes for all 14 skills across 4 categories.
 
 ## Skill Index
 
@@ -11,7 +11,6 @@ critical rules, and common mistakes for all 15 skills across 4 categories.
 | ------------------- | --------------------------------------------- | --------------------------------------------------------------------- |
 | Upload File         | `skills/storage/upload-file/SKILL.md`         | "upload file", "store on 0G", "ZgFile", "save to storage"             |
 | Download File       | `skills/storage/download-file/SKILL.md`       | "download file", "retrieve from 0G", "get file", "fetch from storage" |
-| KV Store            | `skills/storage/kv-store/SKILL.md`            | "key-value", "KV store", "structured data", "kv read", "kv write"     |
 | Merkle Verification | `skills/storage/merkle-verification/SKILL.md` | "verify file", "merkle proof", "data integrity", "root hash"          |
 
 ### Compute Skills
@@ -59,10 +58,10 @@ Load `skills/chain/scaffold-project/SKILL.md` and follow project type selection.
 **Trigger**: "upload", "store", "save to 0G"
 
 ```
-upload-file OR kv-store → AUTO: merkle-verification
+upload-file → AUTO: merkle-verification
 ```
 
-1. Determine if data is a file (→ `upload-file`) or structured key-value (→ `kv-store`)
+1. Use `upload-file` for all data storage
 2. After successful upload, automatically verify using `merkle-verification`
 3. Return root hash to user
 
@@ -71,10 +70,10 @@ upload-file OR kv-store → AUTO: merkle-verification
 **Trigger**: "download", "retrieve", "get file", "fetch"
 
 ```
-download-file OR kv-store → AUTO: merkle-verification
+download-file → AUTO: merkle-verification
 ```
 
-1. Determine if retrieving a file (→ `download-file`) or key-value data (→ `kv-store`)
+1. Use `download-file` to retrieve data by root hash
 2. Use verified download (third param = `true`)
 3. Optionally verify with `merkle-verification`
 
@@ -314,7 +313,7 @@ const amount = ethers.parseEther('1');
 // WRONG
 const file = await ZgFile.fromFilePath(path);
 const [tree] = await file.merkleTree();
-await indexer.upload(file, wallet);
+await indexer.upload(file, process.env.RPC_URL!, wallet);
 // file.close() never called!
 
 // RIGHT
@@ -322,7 +321,8 @@ const file = await ZgFile.fromFilePath(path);
 try {
   const [tree, err] = await file.merkleTree();
   if (err) throw err;
-  await indexer.upload(file, wallet);
+  const [tx, uploadErr] = await indexer.upload(file, process.env.RPC_URL!, wallet);
+  if (uploadErr) throw new Error(`Upload failed: ${uploadErr.message}`);
 } finally {
   await file.close();
 }
@@ -361,6 +361,6 @@ For deep architectural context, reference these pattern documents:
 
 | SDK     | Import                                                                     | Version |
 | ------- | -------------------------------------------------------------------------- | ------- |
-| Storage | `import { ZgFile, Indexer, KvClient, Batcher } from '@0glabs/0g-ts-sdk'`   | ^0.8.0  |
+| Storage | `import { ZgFile, Indexer } from '@0glabs/0g-ts-sdk'`                      | ^0.3.3  |
 | Compute | `import { createZGComputeNetworkBroker } from '@0glabs/0g-serving-broker'` | ^0.6.5  |
 | Chain   | `import { ethers } from 'ethers'`                                          | ^6.13.0 |

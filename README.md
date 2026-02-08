@@ -6,7 +6,7 @@ This repo turns Claude Code, Cursor, and GitHub Copilot into expert 0G developer
 a file to 0G Storage"_ or _"build a chatbot on 0G Compute"_ and get correct, working TypeScript code
 — every time.
 
-**15 skills. 6 architecture references. 3 IDE setups. Zero build step.**
+**14 skills. 6 architecture references. 3 IDE setups. Zero build step.**
 
 ---
 
@@ -44,7 +44,6 @@ npm install @0glabs/0g-serving-broker ethers dotenv   # Compute only
 PRIVATE_KEY=your_private_key_here
 RPC_URL=https://evmrpc-testnet.0g.ai
 STORAGE_INDEXER=https://indexer-storage-testnet-turbo.0g.ai
-KV_INDEXER=https://indexer-kv-testnet.0g.ai
 PROVIDER_ADDRESS=your_compute_provider_address
 ```
 
@@ -70,7 +69,6 @@ Ask your AI assistant anything. Try these:
 | ------------------------------------------------------------------ | -------------------------------------------------------------------------------------- | ------------------------------ |
 | [Upload File](skills/storage/upload-file/SKILL.md)                 | Upload files via ZgFile API + Merkle tree chunking. Returns a root hash for retrieval. | _"upload a file to 0G"_        |
 | [Download File](skills/storage/download-file/SKILL.md)             | Download and verify files by root hash with Merkle proof validation.                   | _"download a file from 0G"_    |
-| [KV Store](skills/storage/kv-store/SKILL.md)                       | Read/write structured key-value data. Batcher for writes, KvClient for reads.          | _"store key-value data on 0G"_ |
 | [Merkle Verification](skills/storage/merkle-verification/SKILL.md) | Compute root hashes and cryptographically verify file integrity.                       | _"verify file integrity"_      |
 
 ### Compute — AI inference on decentralized GPUs
@@ -127,8 +125,8 @@ Discovery    Management           Chat
 | Workflow            | What gets activated                                                                                       |
 | ------------------- | --------------------------------------------------------------------------------------------------------- |
 | **New Project**     | `scaffold-project`                                                                                        |
-| **Upload Data**     | `upload-file` or `kv-store` → auto: `merkle-verification`                                                 |
-| **Download Data**   | `download-file` or `kv-store` → auto: `merkle-verification`                                               |
+| **Upload Data**     | `upload-file` → auto: `merkle-verification`                                                               |
+| **Download Data**   | `download-file` → auto: `merkle-verification`                                                             |
 | **AI Inference**    | auto: `provider-discovery` → `account-management` → `streaming-chat` / `text-to-image` / `speech-to-text` |
 | **Fine-Tune**       | auto: `provider-discovery` → `account-management` → `fine-tuning`                                         |
 | **Deploy Contract** | `deploy-contract`                                                                                         |
@@ -167,7 +165,7 @@ Deep-dive documents for when you need to understand _how_ things work:
 
 | Package                                                                                | Version | Layer                      |
 | -------------------------------------------------------------------------------------- | ------- | -------------------------- |
-| [`@0glabs/0g-ts-sdk`](https://www.npmjs.com/package/@0glabs/0g-ts-sdk)                 | ^0.8.0  | Storage                    |
+| [`@0glabs/0g-ts-sdk`](https://www.npmjs.com/package/@0glabs/0g-ts-sdk)                 | ^0.3.3  | Storage                    |
 | [`@0glabs/0g-serving-broker`](https://www.npmjs.com/package/@0glabs/0g-serving-broker) | ^0.6.5  | Compute                    |
 | [`ethers`](https://docs.ethers.org/v6/)                                                | ^6.13.0 | Chain (v6 only — never v5) |
 
@@ -181,10 +179,9 @@ agent-skills-0g/
 ├── AGENTS.md                        # Orchestration: triggers, workflows, rules
 │
 ├── skills/
-│   ├── storage/                     # 4 skills
+│   ├── storage/                     # 3 skills
 │   │   ├── upload-file/SKILL.md
 │   │   ├── download-file/SKILL.md
-│   │   ├── kv-store/SKILL.md
 │   │   └── merkle-verification/SKILL.md
 │   ├── compute/                     # 6 skills
 │   │   ├── streaming-chat/SKILL.md

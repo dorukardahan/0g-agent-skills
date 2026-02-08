@@ -3,7 +3,7 @@
 ## Metadata
 
 - **Category**: storage
-- **SDK**: `@0glabs/0g-ts-sdk` ^0.8.0
+- **SDK**: `@0glabs/0g-ts-sdk` ^0.3.3
 - **Activation Triggers**: "verify file", "merkle proof", "data integrity", "root hash", "check
   file"
 

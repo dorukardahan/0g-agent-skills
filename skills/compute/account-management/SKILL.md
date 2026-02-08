@@ -80,11 +80,12 @@ async function checkBalance() {
   const wallet = new ethers.Wallet(process.env.PRIVATE_KEY!, provider);
   const broker = await createZGComputeNetworkBroker(wallet);
 
+  // getLedger() returns a tuple array: [address, totalBalance, availableBalance, ...]
   const account = await broker.ledger.getLedger();
 
-  console.log(`Total Balance: ${ethers.formatEther(account.totalBalance)} 0G`);
-  console.log(`Available: ${ethers.formatEther(account.availableBalance)} 0G`);
-  console.log(`Locked: ${ethers.formatEther(account.lockedBalance)} 0G`);
+  console.log(`Address: ${account[0]}`);
+  console.log(`Total Balance: ${ethers.formatEther(account[1])} 0G`);
+  console.log(`Available: ${ethers.formatEther(account[2])} 0G`);
 
   return account;
 }
@@ -117,14 +118,16 @@ async function checkSubAccount(providerAddress: string) {
   const wallet = new ethers.Wallet(process.env.PRIVATE_KEY!, provider);
   const broker = await createZGComputeNetworkBroker(wallet);
 
+  // getAccountWithDetail() returns [subAccountTuple, refundsArray]
+  // subAccount tuple: [0]=user, [1]=provider, [2]=balance, [3]=pendingRefund, ...
   const [subAccount, refunds] = await broker.inference.getAccountWithDetail(providerAddress);
-  console.log(`Sub-account balance: ${ethers.formatEther(subAccount.balance)} 0G`);
+  console.log(`Sub-account user: ${subAccount[0]}`);
+  console.log(`Sub-account provider: ${subAccount[1]}`);
+  console.log(`Sub-account balance: ${ethers.formatEther(subAccount[2])} 0G`);
 
   if (refunds.length > 0) {
-    refunds.forEach((refund, i) => {
-      console.log(`Pending refund ${i + 1}:`);
-      console.log(`  Amount: ${ethers.formatEther(refund.amount)} 0G`);
-      console.log(`  Unlock: ${new Date(refund.unlockTime * 1000)}`);
+    refunds.forEach((refund: any, i: number) => {
+      console.log(`Pending refund ${i + 1}:`, refund);
     });
   }
 }
@@ -169,9 +172,9 @@ async function setupForProvider(providerAddress: string) {
   const wallet = new ethers.Wallet(process.env.PRIVATE_KEY!, provider);
   const broker = await createZGComputeNetworkBroker(wallet);
 
-  // 1. Check current balance
+  // 1. Check current balance (tuple: [0]=addr, [1]=total, [2]=available)
   const account = await broker.ledger.getLedger();
-  const available = parseFloat(ethers.formatEther(account.availableBalance));
+  const available = parseFloat(ethers.formatEther(account[2]));
   console.log(`Available balance: ${available} 0G`);
 
   // 2. Deposit if needed
@@ -201,8 +204,9 @@ async function safeFundProvider(providerAddress: string, amount: number) {
   const broker = await createZGComputeNetworkBroker(wallet);
 
   try {
+    // Tuple: [0]=address, [1]=totalBalance, [2]=availableBalance
     const account = await broker.ledger.getLedger();
-    const available = parseFloat(ethers.formatEther(account.availableBalance));
+    const available = parseFloat(ethers.formatEther(account[2]));
 
     if (available < amount) {
       const depositNeeded = amount - available + 1; // +1 buffer

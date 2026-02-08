@@ -24,7 +24,7 @@ correct SDK patterns.
 
 ## Key SDKs
 
-- @0glabs/0g-ts-sdk ^0.8.0 — Storage (upload, download, KV)
+- @0glabs/0g-ts-sdk ^0.3.3 — Storage (upload, download)
 - @0glabs/0g-serving-broker ^0.6.5 — Compute (inference, fine-tuning)
 - ethers ^6.13.0 — Chain interaction (MUST be v6)
 

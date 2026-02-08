@@ -3,7 +3,7 @@
 ## Metadata
 
 - **Category**: chain
-- **SDK**: `ethers` ^6.13.0, `@0glabs/0g-ts-sdk` ^0.8.0, `@0glabs/0g-serving-broker` ^0.6.5
+- **SDK**: `ethers` ^6.13.0, `@0glabs/0g-ts-sdk` ^0.3.3, `@0glabs/0g-serving-broker` ^0.6.5
 - **Activation Triggers**: "new project", "scaffold", "initialize", "create 0G app", "setup project"
 
 ## Purpose
@@ -90,7 +90,6 @@ PRIVATE_KEY=your_private_key_here
 
 # Storage
 STORAGE_INDEXER=https://indexer-storage-testnet-turbo.0g.ai
-KV_INDEXER=https://indexer-kv-testnet.0g.ai
 
 # Compute
 PROVIDER_ADDRESS=your_provider_address

@@ -3,7 +3,7 @@
 ## Metadata
 
 - **Category**: cross-layer
-- **SDK**: `@0glabs/0g-serving-broker` ^0.6.5, `@0glabs/0g-ts-sdk` ^0.8.0, `ethers` ^6.13.0
+- **SDK**: `@0glabs/0g-serving-broker` ^0.6.5, `@0glabs/0g-ts-sdk` ^0.3.3, `ethers` ^6.13.0
 - **Activation Triggers**: "AI with storage", "generate and store", "transcribe and store",
   "inference with storage", "AI pipeline"
 
@@ -113,8 +113,9 @@ async function generateAndStore(prompt: string): Promise<string> {
   try {
     const [tree, err] = await file.merkleTree();
     if (err) throw new Error(`Merkle tree error: ${err}`);
-    rootHash = tree.rootHash();
-    await indexer.upload(file, wallet);
+    rootHash = tree!.rootHash();
+    const [, uploadErr] = await indexer.upload(file, process.env.RPC_URL!, wallet);
+    if (uploadErr) throw new Error(`Upload failed: ${uploadErr.message}`);
   } finally {
     await file.close();
     fs.unlinkSync(tempPath); // Clean up
@@ -136,9 +137,15 @@ async function transcribeFromStorage(audioRootHash: string): Promise<string> {
   const wallet = new ethers.Wallet(process.env.PRIVATE_KEY!, ethersProvider);
 
   // --- Storage: Download audio ---
+  // Note: download() can throw or return errors — handle both
   const indexer = new Indexer(process.env.STORAGE_INDEXER!);
   const tempAudioPath = path.join(os.tmpdir(), `0g-audio-${Date.now()}.mp3`);
-  await indexer.download(audioRootHash, tempAudioPath, true);
+  try {
+    const dlErr = await indexer.download(audioRootHash, tempAudioPath, true);
+    if (dlErr) throw dlErr;
+  } catch (error: any) {
+    throw new Error(`Download failed: ${error.message}`);
+  }
   console.log('Downloaded audio from storage');
 
   // --- Compute: Transcribe ---
@@ -184,9 +191,15 @@ async function chatAboutStoredData(dataRootHash: string, question: string): Prom
   const wallet = new ethers.Wallet(process.env.PRIVATE_KEY!, ethersProvider);
 
   // --- Storage: Download data ---
+  // Note: download() can throw or return errors — handle both
   const indexer = new Indexer(process.env.STORAGE_INDEXER!);
   const tempPath = path.join(os.tmpdir(), `0g-data-${Date.now()}.txt`);
-  await indexer.download(dataRootHash, tempPath, true);
+  try {
+    const dlErr = await indexer.download(dataRootHash, tempPath, true);
+    if (dlErr) throw dlErr;
+  } catch (error: any) {
+    throw new Error(`Download failed: ${error.message}`);
+  }
   const fileContent = fs.readFileSync(tempPath, 'utf-8');
   fs.unlinkSync(tempPath);
 
@@ -264,8 +277,9 @@ async function fullPipeline(
   try {
     const [tree, err] = await file.merkleTree();
     if (err) throw err;
-    rootHash = tree.rootHash();
-    await indexer.upload(file, wallet);
+    rootHash = tree!.rootHash();
+    const [, uploadErr] = await indexer.upload(file, process.env.RPC_URL!, wallet);
+    if (uploadErr) throw new Error(`Upload failed: ${uploadErr.message}`);
   } finally {
     await file.close();
     fs.unlinkSync(tempPath);
@@ -311,13 +325,13 @@ fs.writeFileSync(tempPath, data); // processResponse() never called!
 
 // BAD: Not closing file handles
 const file = await ZgFile.fromFilePath(tempPath);
-await indexer.upload(file, wallet);
+await indexer.upload(file, process.env.RPC_URL!, wallet);
 // file.close() missing!
 
 // BAD: Not cleaning up temp files
 const tempPath = path.join(os.tmpdir(), 'temp.png');
 fs.writeFileSync(tempPath, buffer);
-await indexer.upload(file, wallet);
+await indexer.upload(file, process.env.RPC_URL!, wallet);
 // fs.unlinkSync(tempPath) missing!
 ```
 

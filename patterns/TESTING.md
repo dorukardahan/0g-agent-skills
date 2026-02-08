@@ -188,17 +188,23 @@ describe.skipIf(!process.env.RUN_INTEGRATION)('Storage Integration', () => {
   it('should upload and download a file', async () => {
     // Upload
     const file = await ZgFile.fromFilePath('./test-fixtures/sample.txt');
-    const [tree] = await file.merkleTree();
-    const rootHash = tree!.rootHash();
-    await indexer.upload(file, wallet);
-    await file.close();
+    try {
+      const [tree, err] = await file.merkleTree();
+      if (err) throw err;
+      const rootHash = tree!.rootHash();
+      const [, uploadErr] = await indexer.upload(file, process.env.RPC_URL!, wallet);
+      if (uploadErr) throw uploadErr;
 
-    // Download
-    const outputPath = './test-output/downloaded.txt';
-    await indexer.download(rootHash, outputPath, true);
+      // Download (can throw — use try/catch)
+      const outputPath = './test-output/downloaded.txt';
+      const dlErr = await indexer.download(rootHash, outputPath, true);
+      if (dlErr) throw dlErr;
 
-    // Verify
-    expect(fs.existsSync(outputPath)).toBe(true);
+      // Verify
+      expect(fs.existsSync(outputPath)).toBe(true);
+    } finally {
+      await file.close();
+    }
   }, 120_000); // Long timeout for network operations
 });
 ```

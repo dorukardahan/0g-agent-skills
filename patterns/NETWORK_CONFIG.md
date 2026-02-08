@@ -15,7 +15,6 @@ Single source of truth for all 0G network endpoints, chain IDs, SDK versions, an
 | Block Explorer  | `https://chainscan-galileo.0g.ai`             |
 | Storage RPC     | `https://storagerpc-testnet.0g.ai`            |
 | Storage Indexer | `https://indexer-storage-testnet-turbo.0g.ai` |
-| KV Indexer      | `https://indexer-kv-testnet.0g.ai`            |
 
 ### Mainnet (Aristotle)
 
@@ -28,13 +27,12 @@ Single source of truth for all 0G network endpoints, chain IDs, SDK versions, an
 | Block Explorer  | `https://chainscan.0g.ai`             |
 | Storage RPC     | `https://storagerpc.0g.ai`            |
 | Storage Indexer | `https://indexer-storage-turbo.0g.ai` |
-| KV Indexer      | `https://indexer-kv.0g.ai`            |
 
 ## SDK Versions
 
 | Package                     | Version   | Purpose                                     |
 | --------------------------- | --------- | ------------------------------------------- |
-| `@0glabs/0g-ts-sdk`         | `^0.8.0`  | Storage operations (upload, download, KV)   |
+| `@0glabs/0g-ts-sdk`         | `^0.3.3`  | Storage operations (upload, download)       |
 | `@0glabs/0g-serving-broker` | `^0.6.5`  | Compute operations (inference, fine-tuning) |
 | `ethers`                    | `^6.13.0` | Chain interaction (MUST be v6, NOT v5)      |
 | `dotenv`                    | `^16.4.0` | Environment variable management             |
@@ -52,9 +50,7 @@ CHAIN_ID=16602
 PRIVATE_KEY=your_private_key_here
 
 # Storage Endpoints
-STORAGE_RPC=https://storagerpc-testnet.0g.ai
 STORAGE_INDEXER=https://indexer-storage-testnet-turbo.0g.ai
-KV_INDEXER=https://indexer-kv-testnet.0g.ai
 
 # Compute
 PROVIDER_ADDRESS=your_provider_address
@@ -146,7 +142,6 @@ function getNetworkConfig(network: Network) {
       chainId: 16602,
       storageRpc: 'https://storagerpc-testnet.0g.ai',
       storageIndexer: 'https://indexer-storage-testnet-turbo.0g.ai',
-      kvIndexer: 'https://indexer-kv-testnet.0g.ai',
       explorer: 'https://chainscan-galileo.0g.ai',
     },
     mainnet: {
@@ -154,7 +149,6 @@ function getNetworkConfig(network: Network) {
       chainId: 16661,
       storageRpc: 'https://storagerpc.0g.ai',
       storageIndexer: 'https://indexer-storage-turbo.0g.ai',
-      kvIndexer: 'https://indexer-kv.0g.ai',
       explorer: 'https://chainscan.0g.ai',
     },
   };

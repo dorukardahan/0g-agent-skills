@@ -3,7 +3,7 @@
 ## Metadata
 
 - **Category**: cross-layer
-- **SDK**: `@0glabs/0g-ts-sdk` ^0.8.0, `ethers` ^6.13.0
+- **SDK**: `@0glabs/0g-ts-sdk` ^0.3.3, `ethers` ^6.13.0
 - **Activation Triggers**: "on-chain reference", "NFT metadata on 0G", "store hash on-chain",
   "registry contract", "chain and storage"
 
@@ -112,8 +112,9 @@ async function uploadAndRegister(
   try {
     const [tree, err] = await file.merkleTree();
     if (err) throw new Error(`Merkle tree error: ${err}`);
-    rootHash = tree.rootHash();
-    await indexer.upload(file, wallet);
+    rootHash = tree!.rootHash();
+    const [, uploadErr] = await indexer.upload(file, process.env.RPC_URL!, wallet);
+    if (uploadErr) throw new Error(`Upload failed: ${uploadErr.message}`);
     console.log('Uploaded to storage, root hash:', rootHash);
   } finally {
     await file.close();
@@ -153,8 +154,14 @@ async function retrieveFile(
   console.log('Timestamp:', new Date(Number(record.timestamp) * 1000));
 
   // Step 2: Download from storage with verification
+  // Note: download() can throw or return errors — handle both
   const indexer = new Indexer(process.env.STORAGE_INDEXER!);
-  await indexer.download(rootHash, outputPath, true);
+  try {
+    const dlErr = await indexer.download(rootHash, outputPath, true);
+    if (dlErr) throw dlErr;
+  } catch (error: any) {
+    throw new Error(`Download failed: ${error.message}`);
+  }
   console.log('Downloaded and verified:', outputPath);
 }
 ```
@@ -177,8 +184,9 @@ async function storeNFTMetadata(
   try {
     const [tree, err] = await imageFile.merkleTree();
     if (err) throw err;
-    imageRootHash = tree.rootHash();
-    await indexer.upload(imageFile, wallet);
+    imageRootHash = tree!.rootHash();
+    const [, imgErr] = await indexer.upload(imageFile, process.env.RPC_URL!, wallet);
+    if (imgErr) throw new Error(`Image upload failed: ${imgErr.message}`);
   } finally {
     await imageFile.close();
   }
@@ -206,8 +214,9 @@ async function storeNFTMetadata(
   try {
     const [tree, err] = await metadataFile.merkleTree();
     if (err) throw err;
-    metadataRootHash = tree.rootHash();
-    await indexer.upload(metadataFile, wallet);
+    metadataRootHash = tree!.rootHash();
+    const [, metaErr] = await indexer.upload(metadataFile, process.env.RPC_URL!, wallet);
+    if (metaErr) throw new Error(`Metadata upload failed: ${metaErr.message}`);
   } finally {
     await metadataFile.close();
     fs.unlinkSync(tempPath);
@@ -243,7 +252,7 @@ await contract.storeFile(fileBuffer); // Extremely expensive!
 // BAD: Registering before upload completes
 const rootHash = tree.rootHash();
 await registry.registerFile(rootHash, metadata);
-await indexer.upload(file, wallet); // Upload AFTER register — data not available!
+await indexer.upload(file, process.env.RPC_URL!, wallet); // Upload AFTER register — data not available!
 
 // BAD: Skipping verification on download
 await indexer.download(rootHash, outputPath, false); // Unverified!

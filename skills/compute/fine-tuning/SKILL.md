@@ -172,9 +172,10 @@ async function checkFineTuningAccount(providerAddress: string) {
   // Transfer funds for fine-tuning
   await broker.ledger.transferFund(providerAddress, 'fine-tuning', ethers.parseEther('1'));
 
-  // Check sub-account
-  const { account, refunds } = await broker.fineTuning.getAccountWithDetail(providerAddress);
-  console.log(`Fine-tuning balance: ${ethers.formatEther(account.balance)} 0G`);
+  // Check sub-account (returns [subAccountTuple, refundsArray])
+  const [account, refunds] = await broker.fineTuning.getAccountWithDetail(providerAddress);
+  // Tuple: [0]=user, [1]=provider, [2]=balance, ...
+  console.log(`Fine-tuning balance: ${ethers.formatEther(account[2])} 0G`);
 }
 ```
 

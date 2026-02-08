@@ -147,8 +147,9 @@ function checkRateLimit(): boolean {
 
 ```typescript
 async function ensureSufficientBalance(broker: any, minBalance: number) {
+  // getLedger() returns tuple: [0]=address, [1]=totalBalance, [2]=availableBalance
   const account = await broker.ledger.getLedger();
-  const available = parseFloat(ethers.formatEther(account.availableBalance));
+  const available = parseFloat(ethers.formatEther(account[2]));
   if (available < minBalance) {
     throw new Error(`Insufficient balance: ${available} 0G available, ${minBalance} 0G required`);
   }
