@@ -1,103 +1,233 @@
 # 0G Agent Skills
 
-AI agent skills for building on the **0G decentralized AI operating system** — Storage, Compute, and
-Chain.
+**Give your AI coding assistant superpowers for building on 0G.**
 
-Give your AI coding assistant (Claude Code, Cursor, Copilot) complete context for building on 0G.
-Ask it to "upload a file to 0G" or "run AI inference on 0G Compute" and get correct, working code.
+This repo turns Claude Code, Cursor, and GitHub Copilot into expert 0G developers. Just say _"upload
+a file to 0G Storage"_ or _"build a chatbot on 0G Compute"_ and get correct, working TypeScript code
+— every time.
 
-## What's Inside
+**15 skills. 6 architecture references. 3 IDE setups. Zero build step.**
 
-**15 skills** across 4 categories:
-
-| Category        | Skills                                                                         | What You Can Build                         |
-| --------------- | ------------------------------------------------------------------------------ | ------------------------------------------ |
-| **Storage**     | Upload, Download, KV Store, Merkle Verification                                | Decentralized file storage, key-value data |
-| **Compute**     | Chat, Image Gen, Speech-to-Text, Fine-Tuning, Provider Discovery, Account Mgmt | AI-powered applications                    |
-| **Chain**       | Deploy, Interact, Scaffold                                                     | Smart contracts on 0G Chain                |
-| **Cross-Layer** | Storage+Chain, Compute+Storage                                                 | Full-stack dApps                           |
-
-Plus **6 pattern documents** (architecture deep-dives), **3 IDE setup guides**, and full
-orchestration via `AGENTS.md`.
+---
 
 ## Quick Start
 
-### 1. Install
+### 1. Clone into your project
 
 ```bash
 git clone https://github.com/0gfoundation/agent-skills-0g .0g-skills
 ```
 
-### 2. Set Up Your IDE
+### 2. Connect your IDE
 
-| IDE             | Setup                                                                                  |
+| IDE             | How                                                                                    |
 | --------------- | -------------------------------------------------------------------------------------- |
-| **Claude Code** | Copy `CLAUDE.md` to project root — auto-detected                                       |
+| **Claude Code** | `cp .0g-skills/CLAUDE.md ./CLAUDE.md` — auto-detected on next session                  |
 | **Cursor**      | Create `.cursorrules` — see [setup guide](setups/cursor/README.md)                     |
 | **Copilot**     | Create `.github/copilot-instructions.md` — see [setup guide](setups/copilot/README.md) |
 
-### 3. Start Building
+### 3. Install SDKs
 
-Ask your AI assistant:
+```bash
+# Everything
+npm install @0glabs/0g-ts-sdk @0glabs/0g-serving-broker ethers dotenv
 
-- _"Upload a file to 0G Storage"_
-- _"Build a chatbot using 0G Compute"_
-- _"Deploy a smart contract to 0G Chain"_
-- _"Create an NFT with metadata stored on 0G"_
+# Or just what you need
+npm install @0glabs/0g-ts-sdk ethers dotenv          # Storage only
+npm install @0glabs/0g-serving-broker ethers dotenv   # Compute only
+```
 
-The assistant will generate correct, working TypeScript code using current SDK versions.
+### 4. Create `.env`
+
+```bash
+# .env — NEVER commit this file
+PRIVATE_KEY=your_private_key_here
+RPC_URL=https://evmrpc-testnet.0g.ai
+STORAGE_INDEXER=https://indexer-storage-testnet-turbo.0g.ai
+KV_INDEXER=https://indexer-kv-testnet.0g.ai
+PROVIDER_ADDRESS=your_compute_provider_address
+```
+
+### 5. Start building
+
+Ask your AI assistant anything. Try these:
+
+```
+"Upload a file to 0G Storage"
+"Build a streaming chatbot with 0G Compute"
+"Deploy a Solidity contract to 0G Chain"
+"Generate an image with AI and store it on 0G"
+"Create an NFT with metadata stored on 0G Storage"
+```
+
+---
+
+## Skills Catalog
+
+### Storage — Decentralized file and data storage
+
+| Skill                                                              | What it does                                                                           | Say this to activate           |
+| ------------------------------------------------------------------ | -------------------------------------------------------------------------------------- | ------------------------------ |
+| [Upload File](skills/storage/upload-file/SKILL.md)                 | Upload files via ZgFile API + Merkle tree chunking. Returns a root hash for retrieval. | _"upload a file to 0G"_        |
+| [Download File](skills/storage/download-file/SKILL.md)             | Download and verify files by root hash with Merkle proof validation.                   | _"download a file from 0G"_    |
+| [KV Store](skills/storage/kv-store/SKILL.md)                       | Read/write structured key-value data. Batcher for writes, KvClient for reads.          | _"store key-value data on 0G"_ |
+| [Merkle Verification](skills/storage/merkle-verification/SKILL.md) | Compute root hashes and cryptographically verify file integrity.                       | _"verify file integrity"_      |
+
+### Compute — AI inference on decentralized GPUs
+
+| Skill                                                            | What it does                                                                                       | Say this to activate          |
+| ---------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- | ----------------------------- |
+| [Streaming Chat](skills/compute/streaming-chat/SKILL.md)         | Conversational AI with DeepSeek V3.1, Qwen, Gemma, GPT-OSS. Streaming + non-streaming.             | _"build a chatbot with 0G"_   |
+| [Text to Image](skills/compute/text-to-image/SKILL.md)           | Generate images from text prompts using Flux Turbo. Multiple resolutions, batch support.           | _"generate an image with 0G"_ |
+| [Speech to Text](skills/compute/speech-to-text/SKILL.md)         | Transcribe audio with Whisper Large V3. Outputs JSON, plain text, or SRT subtitles.                | _"transcribe audio with 0G"_  |
+| [Provider Discovery](skills/compute/provider-discovery/SKILL.md) | List providers, check TEE verification, acknowledge before first use.                              | _"find a compute provider"_   |
+| [Account Management](skills/compute/account-management/SKILL.md) | Deposit, transfer, refund, and withdraw across the dual-account system.                            | _"deposit funds for compute"_ |
+| [Fine-Tuning](skills/compute/fine-tuning/SKILL.md)               | Train custom models on distributed GPUs. Upload data, monitor, download results. **Testnet only.** | _"fine-tune a model on 0G"_   |
+
+### Chain — Smart contracts on 0G's EVM L1
+
+| Skill                                                        | What it does                                                                                   | Say this to activate            |
+| ------------------------------------------------------------ | ---------------------------------------------------------------------------------------------- | ------------------------------- |
+| [Deploy Contract](skills/chain/deploy-contract/SKILL.md)     | Deploy Solidity contracts via Hardhat, Foundry, or ethers v6. Requires `evmVersion: "cancun"`. | _"deploy a contract to 0G"_     |
+| [Interact Contract](skills/chain/interact-contract/SKILL.md) | Read state, send transactions, listen to events, estimate gas — all ethers v6.                 | _"call a contract on 0G Chain"_ |
+| [Scaffold Project](skills/chain/scaffold-project/SKILL.md)   | Generate a new project with correct SDKs, TypeScript config, and boilerplate.                  | _"create a new 0G project"_     |
+
+### Cross-Layer — Full-stack decentralized apps
+
+| Skill                                                                 | What it does                                                                                        | Say this to activate                     |
+| --------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- | ---------------------------------------- |
+| [Storage + Chain](skills/cross-layer/storage-plus-chain/SKILL.md)     | On-chain smart contract references to off-chain storage. NFT metadata, registries, verifiable docs. | _"store NFT metadata on 0G"_             |
+| [Compute + Storage](skills/cross-layer/compute-plus-storage/SKILL.md) | AI inference pipelines with persistent storage. Generate-then-store, load-then-process.             | _"generate an image and store it on 0G"_ |
+
+---
+
+## How It Works
+
+When you ask your AI assistant to build something on 0G, it follows an automated workflow:
+
+```
+You say: "Build a chatbot on 0G Compute"
+                    |
+        AGENTS.md matches triggers
+                    |
+    +---------------+----------------+
+    |               |                |
+Provider       Account          Streaming
+Discovery    Management           Chat
+ (auto)        (auto)           (primary)
+    |               |                |
+    +---------------+----------------+
+                    |
+          Working TypeScript code
+        with correct SDK patterns
+```
+
+**8 built-in workflows** handle common tasks automatically:
+
+| Workflow            | What gets activated                                                                                       |
+| ------------------- | --------------------------------------------------------------------------------------------------------- |
+| **New Project**     | `scaffold-project`                                                                                        |
+| **Upload Data**     | `upload-file` or `kv-store` → auto: `merkle-verification`                                                 |
+| **Download Data**   | `download-file` or `kv-store` → auto: `merkle-verification`                                               |
+| **AI Inference**    | auto: `provider-discovery` → `account-management` → `streaming-chat` / `text-to-image` / `speech-to-text` |
+| **Fine-Tune**       | auto: `provider-discovery` → `account-management` → `fine-tuning`                                         |
+| **Deploy Contract** | `deploy-contract`                                                                                         |
+| **Cross-Layer App** | `storage-plus-chain` / `compute-plus-storage`                                                             |
+| **Manage Funds**    | `account-management`                                                                                      |
+
+---
+
+## Architecture References
+
+Deep-dive documents for when you need to understand _how_ things work:
+
+| Document                                        | What's inside                                                                                |
+| ----------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| [NETWORK_CONFIG.md](patterns/NETWORK_CONFIG.md) | RPC endpoints, chain IDs, SDK versions, `.env` template, initialization patterns             |
+| [STORAGE.md](patterns/STORAGE.md)               | Two-layer architecture (Log + KV), ZgFile lifecycle, upload/download internals, indexer API  |
+| [COMPUTE.md](patterns/COMPUTE.md)               | Broker lifecycle, `processResponse()` deep-dive, ChatID extraction rules, streaming patterns |
+| [CHAIN.md](patterns/CHAIN.md)                   | Hardhat/Foundry configs, `evmVersion: "cancun"`, ethers v5 → v6 migration table              |
+| [SECURITY.md](patterns/SECURITY.md)             | Key management, `.env` best practices, TEE verification, contract access control             |
+| [TESTING.md](patterns/TESTING.md)               | Vitest mocks for all SDKs, Hardhat/Foundry contract tests, testnet integration testing       |
+
+---
+
+## Networks
+
+| Network             | RPC Endpoint                   | Chain ID | Explorer                          |
+| ------------------- | ------------------------------ | -------- | --------------------------------- |
+| Testnet (Galileo)   | `https://evmrpc-testnet.0g.ai` | 16602    | `https://chainscan-galileo.0g.ai` |
+| Mainnet (Aristotle) | `https://evmrpc.0g.ai`         | 16661    | `https://chainscan.0g.ai`         |
+
+**Faucet (testnet):** [https://faucet.0g.ai](https://faucet.0g.ai)
+
+---
+
+## SDKs
+
+| Package                                                                                | Version | Layer                      |
+| -------------------------------------------------------------------------------------- | ------- | -------------------------- |
+| [`@0glabs/0g-ts-sdk`](https://www.npmjs.com/package/@0glabs/0g-ts-sdk)                 | ^0.8.0  | Storage                    |
+| [`@0glabs/0g-serving-broker`](https://www.npmjs.com/package/@0glabs/0g-serving-broker) | ^0.6.5  | Compute                    |
+| [`ethers`](https://docs.ethers.org/v6/)                                                | ^6.13.0 | Chain (v6 only — never v5) |
+
+---
 
 ## Repository Structure
 
 ```
 agent-skills-0g/
-├── CLAUDE.md              # Auto-loader for Claude Code
-├── AGENTS.md              # Master orchestration (workflows, rules, triggers)
+├── CLAUDE.md                        # Auto-loader for Claude Code
+├── AGENTS.md                        # Orchestration: triggers, workflows, rules
+│
 ├── skills/
-│   ├── storage/           # 4 storage skills
-│   ├── compute/           # 6 compute skills
-│   ├── chain/             # 3 chain skills
-│   └── cross-layer/       # 2 cross-layer skills
-├── patterns/              # 6 architecture reference docs
-├── setups/                # IDE-specific setup guides
-├── INSTALL.md             # Installation guide
-└── CONTRIBUTING.md        # Contribution guide
+│   ├── storage/                     # 4 skills
+│   │   ├── upload-file/SKILL.md
+│   │   ├── download-file/SKILL.md
+│   │   ├── kv-store/SKILL.md
+│   │   └── merkle-verification/SKILL.md
+│   ├── compute/                     # 6 skills
+│   │   ├── streaming-chat/SKILL.md
+│   │   ├── text-to-image/SKILL.md
+│   │   ├── speech-to-text/SKILL.md
+│   │   ├── provider-discovery/SKILL.md
+│   │   ├── account-management/SKILL.md
+│   │   └── fine-tuning/SKILL.md
+│   ├── chain/                       # 3 skills
+│   │   ├── deploy-contract/SKILL.md
+│   │   ├── interact-contract/SKILL.md
+│   │   └── scaffold-project/SKILL.md
+│   └── cross-layer/                 # 2 skills
+│       ├── storage-plus-chain/SKILL.md
+│       └── compute-plus-storage/SKILL.md
+│
+├── patterns/                        # 6 architecture references
+│   ├── NETWORK_CONFIG.md
+│   ├── STORAGE.md
+│   ├── COMPUTE.md
+│   ├── CHAIN.md
+│   ├── SECURITY.md
+│   └── TESTING.md
+│
+├── setups/                          # IDE-specific guides
+│   ├── claude-code/README.md
+│   ├── cursor/README.md
+│   └── copilot/README.md
+│
+├── INSTALL.md                       # Detailed installation guide
+└── CONTRIBUTING.md                  # How to add new skills
 ```
 
-## SDKs & Versions
-
-| Package                     | Version | Purpose                          |
-| --------------------------- | ------- | -------------------------------- |
-| `@0glabs/0g-ts-sdk`         | ^0.8.0  | Storage (upload, download, KV)   |
-| `@0glabs/0g-serving-broker` | ^0.6.5  | Compute (inference, fine-tuning) |
-| `ethers`                    | ^6.13.0 | Chain interaction (v6 only)      |
-
-## Key Rules
-
-These critical rules are embedded throughout the skills and enforced by `AGENTS.md`:
-
-1. **processResponse()** — Call after every compute inference. Param order:
-   `(providerAddress, chatID, usageData)`
-2. **ChatID** — Extract from `ZG-Res-Key` header first, body as fallback
-3. **evmVersion** — Always `"cancun"` for 0G Chain contracts
-4. **ethers v6** — Never use v5 patterns
-5. **File handles** — Always close `ZgFile` in `finally` blocks
-6. **No hardcoded keys** — Always use `.env`
-
-## Networks
-
-| Network             | RPC Endpoint                   | Chain ID |
-| ------------------- | ------------------------------ | -------- |
-| Testnet (Galileo)   | `https://evmrpc-testnet.0g.ai` | 16602    |
-| Mainnet (Aristotle) | `https://evmrpc.0g.ai`         | 16661    |
+---
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on adding new skills.
+Want to add a skill or improve an existing one? See [CONTRIBUTING.md](CONTRIBUTING.md).
 
-## License
+Every skill follows a consistent template: Metadata, Purpose, Prerequisites, Quick Workflow, Core
+Rules, Code Examples, Anti-Patterns, Common Errors, Related Skills, and References.
 
-MIT — see [LICENSE](LICENSE)
+---
 
 ## Links
 
@@ -105,4 +235,9 @@ MIT — see [LICENSE](LICENSE)
 - [0G Storage SDK](https://docs.0g.ai/build-with-0g/storage-network/sdk)
 - [0G Compute SDK](https://docs.0g.ai/build-with-0g/compute-network/sdk)
 - [0G Chain](https://docs.0g.ai/build-with-0g/0g-chain)
+- [Testnet Faucet](https://faucet.0g.ai)
 - [Discord](https://discord.gg/0glabs)
+
+## License
+
+MIT — see [LICENSE](LICENSE)
