@@ -25,6 +25,13 @@ dist/
 build/
 coverage/
 
+# CI temp files
+ci/.tmp/
+
+# Examples
+examples/**/node_modules/
+examples/**/.env
+
 # Logs
 *.log
 npm-debug.log*

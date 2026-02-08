@@ -22,10 +22,17 @@
   ],
   "scripts": {
     "format": "prettier --write '**/*.md'",
-    "format:check": "prettier --check '**/*.md'"
+    "format:check": "prettier --check '**/*.md'",
+    "ci:extract": "npx tsx ci/extract-code-blocks.ts",
+    "ci:versions": "npx tsx ci/validate-sdk-versions.ts",
+    "ci:lint": "npx tsx ci/lint-critical-rules.ts",
+    "ci:all": "npm run ci:extract && npm run ci:versions && npm run ci:lint"
   },
   "devDependencies": {
-    "prettier": "^3.2.0"
+    "@types/node": "^20.11.0",
+    "prettier": "^3.2.0",
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.0"
   },
   "agentSkills": {
     "name": "0G Agent Skills",
@@ -36,7 +43,7 @@
       "chain",
       "cross-layer"
     ],
-    "skillCount": 15,
+    "skillCount": 14,
     "entryPoints": {
       "claude-code": "CLAUDE.md",
       "cursor": "setups/cursor/README.md",

@@ -4,3 +4,5 @@ build/
 coverage/
 .git/
 LICENSE
+ci/
+examples/

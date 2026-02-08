@@ -20,8 +20,8 @@ repository contains 14 agent skills across 4 categories: Storage, Compute, Chain
 - **File handles**: ALWAYS close `ZgFile` with `file.close()` in a `finally` block
 - **Private keys**: ALWAYS from `.env`, NEVER hardcoded
 - **Upload signature**: `indexer.upload(file, rpcUrl, signer)` — returns `[result, error]` tuple
-- **Download behavior**: `indexer.download()` can THROW in addition to returning errors — always wrap
-  in try/catch
+- **Download behavior**: `indexer.download()` can THROW in addition to returning errors — always
+  wrap in try/catch
 - **Service tuples**: `listService()` returns tuple arrays, not objects — use `s[0]` for
   providerAddress, `s[1]` for serviceType, `s[6]` for model, `s[10]` for teeVerified
 - **Ledger tuples**: `getLedger()` returns tuple — use `account[1]` for totalBalance, `account[2]`

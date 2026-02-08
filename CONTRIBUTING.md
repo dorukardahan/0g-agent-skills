@@ -122,6 +122,43 @@ npm run format:check
 npm run format
 ```
 
+## CI Pipeline
+
+CI runs automatically on PRs. You can run it locally:
+
+```bash
+npm install
+
+# Run all CI checks
+npm run ci:all
+
+# Or run individually:
+npm run ci:extract    # Extract and type-check code blocks from markdown
+npm run ci:versions   # Validate SDK version references
+npm run ci:lint       # Lint critical rules (processResponse, file.close, etc.)
+```
+
+### What CI Checks
+
+| Check            | What it does                                                       |
+| ---------------- | ------------------------------------------------------------------ |
+| `format:check`   | Prettier formatting on all markdown                                |
+| `ci:extract`     | Extracts ```typescript blocks from skills/ and patterns/, runs tsc |
+| `ci:versions`    | Ensures SDK versions match NETWORK_CONFIG.md                       |
+| `ci:lint`        | processResponse in compute, file.close in storage, cancun in chain |
+| `build-examples` | `npm install && tsc --noEmit` for each example project             |
+
+### Skipping CI for a Code Block
+
+If a code block is intentionally incomplete (e.g., showing an anti-pattern), add `<!-- ci-skip -->`
+before it:
+
+```markdown
+<!-- ci-skip -->
+
+` ` `typescript // This block won't be type-checked const broken = something; ` ` `
+```
+
 ## Pull Request Checklist
 
 - [ ] Skill follows the template structure
@@ -133,3 +170,4 @@ npm run format
 - [ ] Skill registered in `AGENTS.md` and `CLAUDE.md`
 - [ ] Cross-references to related skills are valid
 - [ ] `npm run format:check` passes
+- [ ] `npm run ci:all` passes

@@ -187,11 +187,11 @@ async function safeProviderSetup(serviceType: string) {
 
 > Provider availability varies. Use `listService()` to check current providers.
 
-| Service Type   | Status                      |
-| -------------- | --------------------------- |
-| chatbot        | Available (e.g., Qwen 2.5)  |
-| text-to-image  | Limited availability        |
-| speech-to-text | Limited availability        |
+| Service Type   | Status                     |
+| -------------- | -------------------------- |
+| chatbot        | Available (e.g., Qwen 2.5) |
+| text-to-image  | Limited availability       |
+| speech-to-text | Limited availability       |
 
 ## CLI Commands
 

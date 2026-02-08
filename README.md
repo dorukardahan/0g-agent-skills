@@ -65,11 +65,11 @@ Ask your AI assistant anything. Try these:
 
 ### Storage — Decentralized file and data storage
 
-| Skill                                                              | What it does                                                                           | Say this to activate           |
-| ------------------------------------------------------------------ | -------------------------------------------------------------------------------------- | ------------------------------ |
-| [Upload File](skills/storage/upload-file/SKILL.md)                 | Upload files via ZgFile API + Merkle tree chunking. Returns a root hash for retrieval. | _"upload a file to 0G"_        |
-| [Download File](skills/storage/download-file/SKILL.md)             | Download and verify files by root hash with Merkle proof validation.                   | _"download a file from 0G"_    |
-| [Merkle Verification](skills/storage/merkle-verification/SKILL.md) | Compute root hashes and cryptographically verify file integrity.                       | _"verify file integrity"_      |
+| Skill                                                              | What it does                                                                           | Say this to activate        |
+| ------------------------------------------------------------------ | -------------------------------------------------------------------------------------- | --------------------------- |
+| [Upload File](skills/storage/upload-file/SKILL.md)                 | Upload files via ZgFile API + Merkle tree chunking. Returns a root hash for retrieval. | _"upload a file to 0G"_     |
+| [Download File](skills/storage/download-file/SKILL.md)             | Download and verify files by root hash with Merkle proof validation.                   | _"download a file from 0G"_ |
+| [Merkle Verification](skills/storage/merkle-verification/SKILL.md) | Compute root hashes and cryptographically verify file integrity.                       | _"verify file integrity"_   |
 
 ### Compute — AI inference on decentralized GPUs
 
@@ -96,6 +96,27 @@ Ask your AI assistant anything. Try these:
 | --------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- | ---------------------------------------- |
 | [Storage + Chain](skills/cross-layer/storage-plus-chain/SKILL.md)     | On-chain smart contract references to off-chain storage. NFT metadata, registries, verifiable docs. | _"store NFT metadata on 0G"_             |
 | [Compute + Storage](skills/cross-layer/compute-plus-storage/SKILL.md) | AI inference pipelines with persistent storage. Generate-then-store, load-then-process.             | _"generate an image and store it on 0G"_ |
+
+---
+
+## Examples
+
+Runnable example projects — clone, install, and run against testnet:
+
+| Example                                            | What it builds                                      | Layers            |
+| -------------------------------------------------- | --------------------------------------------------- | ----------------- |
+| [`file-vault`](examples/file-vault/)               | Upload, download, and verify files                  | Storage           |
+| [`ai-chatbot`](examples/ai-chatbot/)               | Discover providers, fund account, chat              | Compute           |
+| [`nft-with-metadata`](examples/nft-with-metadata/) | Deploy contract, upload metadata, register on-chain | Storage + Chain   |
+| [`ai-image-gallery`](examples/ai-image-gallery/)   | Generate images with AI, store on 0G                | Compute + Storage |
+
+```bash
+cd examples/file-vault
+npm install
+cp .env.example .env
+# Add your funded private key, then:
+npx tsx src/upload.ts README.md
+```
 
 ---
 
@@ -198,6 +219,12 @@ agent-skills-0g/
 │       ├── storage-plus-chain/SKILL.md
 │       └── compute-plus-storage/SKILL.md
 │
+├── examples/                        # 4 runnable example projects
+│   ├── file-vault/                  # Storage: upload, download, verify
+│   ├── ai-chatbot/                  # Compute: discover, fund, chat
+│   ├── nft-with-metadata/           # Cross-layer: contract + storage
+│   └── ai-image-gallery/            # Cross-layer: AI + storage
+│
 ├── patterns/                        # 6 architecture references
 │   ├── NETWORK_CONFIG.md
 │   ├── STORAGE.md
@@ -205,6 +232,11 @@ agent-skills-0g/
 │   ├── CHAIN.md
 │   ├── SECURITY.md
 │   └── TESTING.md
+│
+├── ci/                              # CI scripts
+│   ├── extract-code-blocks.ts
+│   ├── validate-sdk-versions.ts
+│   └── lint-critical-rules.ts
 │
 ├── setups/                          # IDE-specific guides
 │   ├── claude-code/README.md
