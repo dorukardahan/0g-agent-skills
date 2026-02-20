@@ -183,22 +183,22 @@ async function safeProviderSetup(serviceType: string) {
 
 ### Mainnet
 
-| Provider | Service Type   | Models                              |
-| -------- | -------------- | ----------------------------------- |
+| Provider | Service Type   | Models                                                                                                                     |
+| -------- | -------------- | -------------------------------------------------------------------------------------------------------------------------- |
 | Various  | chatbot        | deepseek/deepseek-chat-v3-0324, openai/gpt-oss-120b, openai/gpt-oss-20b, zai-org/GLM-5-FP8, qwen/qwen3-vl-30b-a3b-instruct |
-| Various  | text-to-image  | z-image                             |
-| Various  | speech-to-text | openai/whisper-large-v3             |
+| Various  | text-to-image  | z-image                                                                                                                    |
+| Various  | speech-to-text | openai/whisper-large-v3                                                                                                    |
 
 ### Testnet (Galileo)
 
 > Provider availability varies. Use `listService()` to check current providers.
 
-| Service Type   | Status                     |
-| -------------- | -------------------------- |
+| Service Type   | Status                                                                           |
+| -------------- | -------------------------------------------------------------------------------- |
 | chatbot        | Available (qwen/qwen-2.5-7b-instruct, openai/gpt-oss-20b, google/gemma-3-27b-it) |
-| image-editing  | Available (qwen/qwen-image-edit-2511) |
-| text-to-image  | Not available on testnet (mainnet only) |
-| speech-to-text | Not available on testnet (mainnet only) |
+| image-editing  | Available (qwen/qwen-image-edit-2511)                                            |
+| text-to-image  | Not available on testnet (mainnet only)                                          |
+| speech-to-text | Not available on testnet (mainnet only)                                          |
 
 ## CLI Commands
 

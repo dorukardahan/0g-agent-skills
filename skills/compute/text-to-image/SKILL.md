@@ -10,12 +10,14 @@ description: |
 
 - **Category**: compute
 - **SDK**: `@0glabs/0g-serving-broker` ^0.6.5, `ethers` ^6.13.0
-- **Activation Triggers**: "generate image", "text-to-image", "z-image", "image generation", "create image"
+- **Activation Triggers**: "generate image", "text-to-image", "z-image", "image generation", "create
+  image"
 
 ## Purpose
 
-Generate images from text prompts using 0G Compute Network providers (model: `z-image`, mainnet only). Supports
-multiple resolutions and batch generation. Text-to-image is not available on testnet.
+Generate images from text prompts using 0G Compute Network providers (model: `z-image`, mainnet
+only). Supports multiple resolutions and batch generation. Text-to-image is not available on
+testnet.
 
 ## Prerequisites
 

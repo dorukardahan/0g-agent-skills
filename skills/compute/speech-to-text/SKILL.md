@@ -14,8 +14,9 @@ description: |
 
 ## Purpose
 
-Transcribe audio files using 0G Compute Network providers running `openai/whisper-large-v3` (mainnet only — not available on testnet). Supports
-multiple audio formats and output types (JSON, text, SRT subtitles). Use mainnet RPC (`https://evmrpc.0g.ai`).
+Transcribe audio files using 0G Compute Network providers running `openai/whisper-large-v3` (mainnet
+only — not available on testnet). Supports multiple audio formats and output types (JSON, text, SRT
+subtitles). Use mainnet RPC (`https://evmrpc.0g.ai`).
 
 ## Prerequisites
 
