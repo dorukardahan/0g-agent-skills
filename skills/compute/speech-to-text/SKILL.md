@@ -1,7 +1,7 @@
 ---
 name: speech-to-text
 description: |
-  Transcribe audio files using 0G Compute Network providers running Whisper Large V3. Use this skill for "transcribe", "speech-to-text", "Whisper", "audio transcription".
+  Transcribe audio files using 0G Compute Network providers running openai/whisper-large-v3 (mainnet only). Use this skill for "transcribe", "speech-to-text", "Whisper", "audio transcription".
 ---
 
 # Speech-to-Text Transcription
