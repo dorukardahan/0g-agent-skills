@@ -1,3 +1,9 @@
+---
+name: provider-discovery
+description: |
+  Discover, filter, and verify compute providers on the 0G network. Use this skill for "list providers", "find provider", "verify provider", "TEE", "available models".
+---
+
 # Provider Discovery
 
 ## Metadata
@@ -179,9 +185,9 @@ async function safeProviderSetup(serviceType: string) {
 
 | Provider | Service Type   | Models                              |
 | -------- | -------------- | ----------------------------------- |
-| Various  | chatbot        | DeepSeek V3.1, Qwen, Gemma, GPT-OSS |
-| Various  | text-to-image  | Flux Turbo                          |
-| Various  | speech-to-text | Whisper Large V3                    |
+| Various  | chatbot        | deepseek/deepseek-chat-v3-0324, openai/gpt-oss-120b, openai/gpt-oss-20b, zai-org/GLM-5-FP8, qwen/qwen3-vl-30b-a3b-instruct |
+| Various  | text-to-image  | z-image                             |
+| Various  | speech-to-text | openai/whisper-large-v3             |
 
 ### Testnet (Galileo)
 
@@ -189,9 +195,10 @@ async function safeProviderSetup(serviceType: string) {
 
 | Service Type   | Status                     |
 | -------------- | -------------------------- |
-| chatbot        | Available (e.g., Qwen 2.5) |
-| text-to-image  | Limited availability       |
-| speech-to-text | Limited availability       |
+| chatbot        | Available (qwen/qwen-2.5-7b-instruct, openai/gpt-oss-20b, google/gemma-3-27b-it) |
+| image-editing  | Available (qwen/qwen-image-edit-2511) |
+| text-to-image  | Not available on testnet (mainnet only) |
+| speech-to-text | Not available on testnet (mainnet only) |
 
 ## CLI Commands
 

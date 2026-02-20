@@ -1,3 +1,9 @@
+---
+name: fine-tuning
+description: |
+  Fine-tune AI models on 0G's distributed GPU network. Use this skill for "fine-tune", "train model", "custom model", "model training".
+---
+
 # Model Fine-Tuning
 
 ## Metadata
@@ -55,7 +61,7 @@ monitor training, and download the resulting model. **Currently testnet only.**
 
 ## Task Status Lifecycle
 
-```
+```text
 Init -> SettingUp -> SetUp -> Training -> Trained -> Delivering -> Delivered -> UserAcknowledged -> Finished
                                                                                                      |
                                                                                                   Failed

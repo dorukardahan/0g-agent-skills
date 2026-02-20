@@ -1,3 +1,9 @@
+---
+name: compute-plus-storage
+description: |
+  Combine 0G Compute (AI inference) with 0G Storage for end-to-end AI pipelines. Use this skill for AI with storage, generate and store, transcribe and store, inference with storage, AI pipeline.
+---
+
 # Compute + Storage Integration
 
 ## Metadata
@@ -303,7 +309,7 @@ async function fullPipeline(
 
 ## Architecture
 
-```
+```text
 ┌───────────────┐     ┌───────────────┐     ┌───────────────┐
 │  0G Compute   │────▶│  0G Storage   │────▶│  0G Chain     │
 │               │     │               │     │               │
