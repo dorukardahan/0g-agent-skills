@@ -15,8 +15,10 @@ description: |
 ## Purpose
 
 Run conversational AI inference using 0G Compute Network providers. Supports streaming and
-non-streaming modes with models like deepseek/deepseek-chat-v3-0324, openai/gpt-oss-120b, and
-zai-org/GLM-5-FP8. Use `listService()` for current model availability.
+non-streaming modes. Available on both testnet and mainnet with different model sets. Testnet:
+qwen/qwen-2.5-7b-instruct, openai/gpt-oss-20b, google/gemma-3-27b-it. Mainnet:
+deepseek/deepseek-chat-v3-0324, openai/gpt-oss-120b, zai-org/GLM-5-FP8, and others. Use
+`listService()` for current model availability.
 
 ## Prerequisites
 

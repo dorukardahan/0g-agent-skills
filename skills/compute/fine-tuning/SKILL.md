@@ -15,7 +15,8 @@ description: |
 ## Purpose
 
 Fine-tune AI models on 0G's distributed GPU network. Upload training data, configure parameters,
-monitor training, and download the resulting model. **Currently testnet only.**
+monitor training, and download the resulting model. **Currently testnet only** (mainnet fine-tuning
+contract is not yet deployed).
 
 ## Prerequisites
 

@@ -17,6 +17,8 @@ description: |
 
 Combine 0G Compute (AI inference) with 0G Storage for end-to-end AI pipelines: generate content with
 AI and persist results to decentralized storage, or load data from storage and process with AI.
+Note: text-to-image and speech-to-text compute services are mainnet only. Chatbot inference is
+available on both testnet and mainnet. Storage works on both networks.
 
 ## Prerequisites
 
